@@ -9,10 +9,15 @@ const socketController = (socket) => {
     socket.emit('actual-ticket', ticketControl.ultimos4[0].numero);
 
     socket.emit('estado-actual',ticketControl.ultimos4);
+    socket.emit('ticket-pendientes',ticketControl.tickets.length);
+
+
 
     socket.on('siguiente-ticket', (payload, callback) => {
         const siguiente = ticketControl.siguiente();
         callback(siguiente);
+
+        socket.broadcast.emit('ticket-pendientes',ticketControl.tickets.length);
 
         //TODO: Notificar que hay un nuevo ticket pendiente
 
@@ -30,6 +35,9 @@ const socketController = (socket) => {
 
         const ticket = ticketControl.atenderTicket(escritorio);
         socket.broadcast.emit('estado-actual',ticketControl.ultimos4);
+        socket.emit('ticket-pendientes',ticketControl.tickets.length);
+        socket.broadcast.emit('ticket-pendientes',ticketControl.tickets.length);
+
         if (!ticket) {
             return callback({
                 ok: false,
